@@ -39,5 +39,6 @@ Desktop.ini
 # Supabase
 supabase/.temp/
 
-# Large data files (re-downloadable from public APIs)
-기획자료/소상공인시장진흥공단_상가(상권)정보_20251030/*.csv
+# Planning documents & temp files (local only)
+기획자료/
+imsi/
