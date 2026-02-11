@@ -8,6 +8,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The project is in **pre-development planning stage**. Planning documents and a landing page prototype exist, but no application code has been written yet.
 
+## Deployment & Accounts
+
+- **GitHub**: `toktoklabs/byeoljari` (https://github.com/toktoklabs/byeoljari)
+  - Local git credential: 이 리포지토리는 `git config credential.helper ""`로 설정되어 toktoklabs 계정 자격 증명을 별도 사용 (시스템 기본 계정 `KYUNAM-carrot`과 분리)
+- **Vercel**: `eunseos-projects-9975a347` 스코프, 프로젝트명 `byeoljari`
+  - Production URL: https://byeoljari.vercel.app
+  - GitHub `main` 브랜치 푸시 시 자동 배포
+  - 정적 사이트 배포 (`public/` 디렉토리, 빌드 명령 없음)
+
 ## Planned Tech Stack
 
 - **Frontend**: Flutter 3.x (Web + iOS + Android single codebase), Riverpod 2.x state management, Kakao Map SDK, fl_chart
@@ -73,7 +82,8 @@ All planning materials are in `기획자료/` directory:
 
 ## Existing Assets
 
-- `byeoljari_landing.html` — Landing page prototype (vanilla HTML/CSS/JS with constellation animation theme, dark design with gold #d4a853 accent). This is a generic IT consulting page, not the ZARIMAX platform.
+- `byeoljari_landing.html` — Landing page 원본 (vanilla HTML/CSS/JS, constellation animation, dark theme with gold #d4a853 accent)
+- `public/index.html` — Vercel 배포용 랜딩 페이지 (byeoljari_landing.html 복사본)
 
 ## Language
 
