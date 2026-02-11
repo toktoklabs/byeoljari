@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>별자리 코리아 | Byeoljari Korea</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:wght@400;600;700&family=Cormorant+Garamond:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #05050f;
+  --bg-dark: #0a0a1a;
+  --bg-card: rgba(15, 15, 35, 0.6);
+  --accent-gold: #d4a853;
+  --accent-gold-light: #f0d48a;
+  --accent-blue: #4a7cff;
+  --accent-cyan: #5ee7df;
+  --text-primary: #e8e6f0;
+  --text-secondary: #9896a8;
+  --text-muted: #5c5a6e;
+  --border-subtle: rgba(212, 168, 83, 0.12);
+  --glow-gold: rgba(212, 168, 83, 0.15);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* ── Constellation Canvas ── */
+#constellation-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Navigation ── */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.2rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(5, 5, 15, 0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: all 0.4s ease;
+}
+
+.nav.scrolled {
+  padding: 0.8rem 2rem;
+  background: rgba(5, 5, 15, 0.92);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.nav-logo svg {
+  width: 36px; height: 36px;
+}
+
+.nav-logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  letter-spacing: 0.05em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.3s;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0; height: 1px;
+  background: var(--accent-gold);
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover { color: var(--accent-gold); }
+.nav-links a:hover::after { width: 100%; }
+
+.nav-cta {
+  padding: 0.55rem 1.6rem;
+  background: transparent;
+  border: 1px solid var(--accent-gold);
+  color: var(--accent-gold) !important;
+  border-radius: 2px;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.12em !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-cta:hover {
+  background: var(--accent-gold) !important;
+  color: var(--bg-deep) !important;
+}
+
+.nav-cta::after { display: none !important; }
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.hamburger span {
+  width: 24px; height: 1.5px;
+  background: var(--accent-gold);
+  transition: all 0.3s;
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.hero-content {
+  max-width: 800px;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 0.4rem 1.4rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 100px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 0.3em;
+  opacity: 0;
+  animation: fadeUp 1s ease 0.5s forwards;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: var(--text-secondary);
+  font-weight: 300;
+  max-width: 550px;
+  margin: 0 auto 3rem;
+  opacity: 0;
+  animation: fadeUp 1s ease 0.7s forwards;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 1s ease 0.9s forwards;
+}
+
+.btn-primary {
+  padding: 0.9rem 2.8rem;
+  background: linear-gradient(135deg, var(--accent-gold), #c49340);
+  color: var(--bg-deep);
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(212, 168, 83, 0.3);
+}
+
+.btn-secondary {
+  padding: 0.9rem 2.8rem;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+  animation: fadeIn 1s ease 1.5s forwards;
+}
+
+.scroll-indicator span {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.scroll-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--accent-gold), transparent);
+  animation: scrollPulse 2s ease infinite;
+}
+
+/* ── Sections common ── */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 7rem 2rem;
+}
+
+.section-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.section-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  font-weight: 300;
+}
+
+/* ── About ── */
+.about {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.about-visual {
+  position: relative;
+  height: 420px;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-visual-inner {
+  width: 200px; height: 200px;
+  position: relative;
+}
+
+.orbit-ring {
+  position: absolute;
+  border: 1px solid rgba(212, 168, 83, 0.1);
+  border-radius: 50%;
+  animation: spin 20s linear infinite;
+}
+
+.orbit-ring:nth-child(1) { width: 100%; height: 100%; top: 0; left: 0; }
+.orbit-ring:nth-child(2) { width: 160%; height: 160%; top: -30%; left: -30%; animation-duration: 30s; animation-direction: reverse; }
+.orbit-ring:nth-child(3) { width: 220%; height: 220%; top: -60%; left: -60%; animation-duration: 40s; }
+
+.orbit-dot {
+  position: absolute;
+  width: 6px; height: 6px;
+  background: var(--accent-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--accent-gold);
+}
+
+.orbit-ring:nth-child(1) .orbit-dot { top: -3px; left: 50%; }
+.orbit-ring:nth-child(2) .orbit-dot { top: 50%; right: -3px; }
+.orbit-ring:nth-child(3) .orbit-dot { bottom: -3px; left: 30%; }
+
+.center-star {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px; height: 12px;
+  background: var(--accent-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 30px var(--accent-gold), 0 0 60px rgba(212, 168, 83, 0.3);
+  animation: pulse 3s ease infinite;
+}
+
+.about-stats {
+  display: flex;
+  gap: 2.5rem;
+  margin-top: 3rem;
+}
+
+.stat-item h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  line-height: 1;
+}
+
+.stat-item p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 0.3rem;
+}
+
+/* ── Services ── */
+.services-section {
+  background: linear-gradient(180deg, transparent, rgba(10, 10, 26, 0.5), transparent);
+}
+
+.services-header {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 4rem;
+}
+
+.services-header .section-desc { margin: 0 auto; }
+
+.services-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.service-card {
+  padding: 2.5rem 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.service-card:hover {
+  border-color: rgba(212, 168, 83, 0.25);
+  transform: translateY(-4px);
+  background: rgba(15, 15, 35, 0.8);
+}
+
+.service-card:hover::before { opacity: 1; }
+
+.service-icon {
+  width: 48px; height: 48px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-gold);
+}
+
+.service-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: var(--text-primary);
+}
+
+.service-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  line-height: 1.7;
+}
+
+/* ── Values ── */
+.values-section {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.values-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.values-header .section-desc { margin: 0 auto; }
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+
+.value-item {
+  padding: 2.5rem 2rem;
+  border: 1px solid var(--border-subtle);
+  margin-right: -1px;
+  margin-bottom: -1px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.value-item:hover {
+  background: var(--bg-card);
+}
+
+.value-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: rgba(212, 168, 83, 0.2);
+  margin-bottom: 1rem;
+}
+
+.value-item h4 {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.6rem;
+  color: var(--text-primary);
+}
+
+.value-item p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* ── Process / Timeline ── */
+.process-section {
+  background: linear-gradient(180deg, transparent, rgba(10, 10, 26, 0.5), transparent);
+}
+
+.process-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.process-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.process-header .section-desc { margin: 0 auto; }
+
+.timeline {
+  position: relative;
+  padding-left: 3rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 1px; height: 100%;
+  background: linear-gradient(to bottom, var(--accent-gold), var(--border-subtle), transparent);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 3rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -3rem;
+  top: 0.3rem;
+  width: 7px; height: 7px;
+  background: var(--accent-gold);
+  border-radius: 50%;
+  transform: translateX(-3px);
+  box-shadow: 0 0 12px rgba(212, 168, 83, 0.4);
+}
+
+.timeline-step {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 0.4rem;
+}
+
+.timeline-item h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-item p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+}
+
+/* ── Testimonials ── */
+.testimonials-section {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.testimonials-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.testimonial-card {
+  padding: 2.5rem 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+.testimonial-card .quote-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  color: rgba(212, 168, 83, 0.15);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.testimonial-card blockquote {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.author-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-blue));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--bg-deep);
+}
+
+.author-info strong {
+  font-size: 0.85rem;
+  display: block;
+  color: var(--text-primary);
+}
+
+.author-info span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── CTA ── */
+.cta-section {
+  text-align: center;
+  padding: 8rem 2rem;
+}
+
+.cta-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.cta-inner::before {
+  content: '';
+  position: absolute;
+  top: -60px; left: 50%;
+  transform: translateX(-50%);
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(212, 168, 83, 0.06), transparent 70%);
+  pointer-events: none;
+}
+
+.cta-inner .section-title {
+  font-size: clamp(2.2rem, 4vw, 3rem);
+}
+
+.cta-inner .section-desc {
+  margin: 0 auto 2.5rem;
+  text-align: center;
+}
+
+/* ── Footer ── */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border-subtle);
+  padding: 4rem 2rem 2rem;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+}
+
+.footer-brand p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  max-width: 280px;
+  line-height: 1.7;
+}
+
+.footer-col h4 {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 1.2rem;
+}
+
+.footer-col a {
+  display: block;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: 0.6rem;
+  transition: color 0.3s;
+}
+
+.footer-col a:hover { color: var(--text-primary); }
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 3rem auto 0;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.footer-bottom-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-bottom-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-bottom-links a:hover { color: var(--text-secondary); }
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 30px var(--accent-gold), 0 0 60px rgba(212, 168, 83, 0.3); }
+  50% { box-shadow: 0 0 40px var(--accent-gold), 0 0 80px rgba(212, 168, 83, 0.5); }
+}
+
+/* ── Scroll reveal ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Mobile Nav ── */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(5, 5, 15, 0.97);
+  backdrop-filter: blur(20px);
+  z-index: 99;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.mobile-nav.active { display: flex; }
+
+.mobile-nav a {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 1.3rem;
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 0.1em;
+  transition: color 0.3s;
+}
+
+.mobile-nav a:hover { color: var(--accent-gold); }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .services-grid { grid-template-columns: repeat(2, 1fr); }
+  .values-grid { grid-template-columns: repeat(2, 1fr); }
+  .testimonials-grid { grid-template-columns: 1fr 1fr; }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+
+  .about {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .about-visual { height: 300px; }
+
+  .services-grid { grid-template-columns: 1fr; }
+  .values-grid { grid-template-columns: 1fr 1fr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+
+  .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+  .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+
+  .about-stats { gap: 1.5rem; }
+  .stat-item h3 { font-size: 2rem; }
+
+  section { padding: 5rem 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .values-grid { grid-template-columns: 1fr; }
+  .hero-buttons { flex-direction: column; align-items: center; }
+  .hero-buttons a { width: 100%; max-width: 280px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Constellation Background Canvas -->
+<canvas id="constellation-canvas"></canvas>
+
+<!-- Navigation -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="18" r="2.5" fill="#d4a853"/>
+      <circle cx="18" cy="18" r="8" stroke="#d4a853" stroke-width="0.5" opacity="0.5"/>
+      <circle cx="18" cy="18" r="14" stroke="#d4a853" stroke-width="0.3" opacity="0.3"/>
+      <circle cx="10" cy="10" r="1.5" fill="#d4a853" opacity="0.8"/>
+      <circle cx="28" cy="12" r="1" fill="#d4a853" opacity="0.6"/>
+      <circle cx="24" cy="28" r="1.2" fill="#d4a853" opacity="0.7"/>
+      <circle cx="8" cy="26" r="0.8" fill="#d4a853" opacity="0.5"/>
+      <line x1="10" y1="10" x2="18" y2="18" stroke="#d4a853" stroke-width="0.3" opacity="0.4"/>
+      <line x1="28" y1="12" x2="18" y2="18" stroke="#d4a853" stroke-width="0.3" opacity="0.4"/>
+      <line x1="24" y1="28" x2="18" y2="18" stroke="#d4a853" stroke-width="0.3" opacity="0.4"/>
+      <line x1="10" y1="10" x2="8" y2="26" stroke="#d4a853" stroke-width="0.2" opacity="0.3"/>
+    </svg>
+    <span class="nav-logo-text">별자리 코리아</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">회사소개</a></li>
+    <li><a href="#services">서비스</a></li>
+    <li><a href="#values">핵심가치</a></li>
+    <li><a href="#process">프로세스</a></li>
+    <li><a href="#testimonials">고객후기</a></li>
+    <li><a href="#contact" class="nav-cta">문의하기</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#about" onclick="closeMobile()">회사소개</a>
+  <a href="#services" onclick="closeMobile()">서비스</a>
+  <a href="#values" onclick="closeMobile()">핵심가치</a>
+  <a href="#process" onclick="closeMobile()">프로세스</a>
+  <a href="#testimonials" onclick="closeMobile()">고객후기</a>
+  <a href="#contact" onclick="closeMobile()">문의하기</a>
+</div>
+
+<!-- Hero Section -->
+<section class="hero" id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Innovation · Technology · Future</div>
+    <h1>당신의 비전을<br><em>별자리</em>로 잇다</h1>
+    <p class="hero-sub">별자리 코리아는 상가 공실로 고민하는 임대주님과 열정적인 소자본 창업자님을 빛나는 별자리처럼 연결해 드립니다.</p>
+    <div class="hero-buttons">
+      <a href="#contact" class="btn-primary">프로젝트 시작하기</a>
+      <a href="#about" class="btn-secondary">더 알아보기</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about">
+  <div class="about">
+    <div class="reveal">
+      <div class="section-label">About Us</div>
+      <h2 class="section-title">연결하고, 설계하고,<br>실현합니다</h2>
+      <p class="section-desc">별자리 코리아는 AI와 공간혁신을 선도하며, 소자본 창업가님과 공실로 고민하는 건물주님의 동반성장과 변화를 함께 만들어가고 있습니다. 흩어진 아이디어를 하나의 별자리처럼 연결해 의미 있는 결과를 만듭니다.</p>
+      <div class="about-stats">
+        <div class="stat-item">
+          <h3>150+</h3>
+          <p>프로젝트 완료</p>
+        </div>
+        <div class="stat-item">
+          <h3>98%</h3>
+          <p>고객 만족도</p>
+        </div>
+        <div class="stat-item">
+          <h3>7년</h3>
+          <p>업계 경험</p>
+        </div>
+      </div>
+    </div>
+    <div class="about-visual reveal">
+      <div class="about-visual-inner">
+        <div class="orbit-ring"><div class="orbit-dot"></div></div>
+        <div class="orbit-ring"><div class="orbit-dot"></div></div>
+        <div class="orbit-ring"><div class="orbit-dot"></div></div>
+        <div class="center-star"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="services-section">
+  <div class="services-header reveal">
+    <div class="section-label">Services</div>
+    <h2 class="section-title">우리가 만드는 가치</h2>
+    <p class="section-desc">각 분야 전문가들이 모여 최적의 솔루션을 제공합니다.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </div>
+      <h3>디지털 전환 컨설팅</h3>
+      <p>비즈니스 프로세스 분석부터 시스템 설계, 구현까지 전 과정을 맞춤 설계하여 디지털 전환을 가속합니다.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h3>AI & 데이터 솔루션</h3>
+      <p>인공지능과 빅데이터 분석을 활용하여 데이터 기반의 의사결정을 지원하고 비즈니스 인사이트를 제공합니다.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+        </svg>
+      </div>
+      <h3>브랜드 & UX 디자인</h3>
+      <p>사용자 경험 중심의 디자인으로 브랜드 가치를 높이고, 직관적이고 감성적인 인터페이스를 만듭니다.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+        </svg>
+      </div>
+      <h3>소프트웨어 개발</h3>
+      <p>웹, 모바일, 클라우드 기반 맞춤형 소프트웨어를 개발하여 비즈니스 효율성을 극대화합니다.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <h3>보안 & 인프라</h3>
+      <p>안정적이고 확장 가능한 IT 인프라와 철저한 보안 체계로 비즈니스 연속성을 보장합니다.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      </div>
+      <h3>글로벌 IT 아웃소싱</h3>
+      <p>글로벌 네트워크를 통해 최적의 IT 인재와 리소스를 연결하여 경쟁력 있는 솔루션을 제공합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Values Section -->
+<section id="values">
+  <div class="values-section">
+    <div class="values-header reveal">
+      <div class="section-label">Core Values</div>
+      <h2 class="section-title">우리를 이끄는 원칙</h2>
+      <p class="section-desc">별자리 코리아의 모든 프로젝트는 네 가지 핵심 가치를 기반으로 합니다.</p>
+    </div>
+    <div class="values-grid">
+      <div class="value-item reveal">
+        <div class="value-number">01</div>
+        <h4>혁신 Innovation</h4>
+        <p>끊임없는 도전과 실험으로 새로운 가능성을 탐구합니다</p>
+      </div>
+      <div class="value-item reveal">
+        <div class="value-number">02</div>
+        <h4>연결 Connection</h4>
+        <p>기술과 사람, 아이디어를 유기적으로 연결합니다</p>
+      </div>
+      <div class="value-item reveal">
+        <div class="value-number">03</div>
+        <h4>신뢰 Trust</h4>
+        <p>투명한 소통과 약속 이행으로 파트너십을 구축합니다</p>
+      </div>
+      <div class="value-item reveal">
+        <div class="value-number">04</div>
+        <h4>성장 Growth</h4>
+        <p>고객과 함께 성장하며 지속 가능한 가치를 창출합니다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Process Section -->
+<section id="process" class="process-section">
+  <div class="process-inner">
+    <div class="process-header reveal">
+      <div class="section-label">How We Work</div>
+      <h2 class="section-title">프로젝트 진행 프로세스</h2>
+      <p class="section-desc">체계적인 4단계 프로세스로 프로젝트의 성공을 설계합니다.</p>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-step">Phase 01</div>
+        <h3>Discovery & 전략 수립</h3>
+        <p>비즈니스 목표와 요구사항을 심층 분석하고, 최적의 전략과 로드맵을 설계합니다. 이해관계자 인터뷰와 시장 분석을 통해 방향을 정립합니다.</p>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-step">Phase 02</div>
+        <h3>Design & 프로토타이핑</h3>
+        <p>사용자 중심의 와이어프레임과 프로토타입을 제작합니다. 반복적인 피드백 과정을 통해 최적의 사용자 경험을 설계합니다.</p>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-step">Phase 03</div>
+        <h3>Development & 구현</h3>
+        <p>애자일 방법론 기반으로 개발을 진행하며, 정기적인 스프린트 리뷰를 통해 품질과 일정을 관리합니다.</p>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-step">Phase 04</div>
+        <h3>Launch & 지속 성장</h3>
+        <p>안정적인 런칭 이후에도 성능 모니터링, 사용자 분석, 지속적인 개선을 통해 서비스의 성장을 지원합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section id="testimonials">
+  <div class="testimonials-section">
+    <div class="testimonials-header reveal">
+      <div class="section-label">Testimonials</div>
+      <h2 class="section-title">고객이 전하는 이야기</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">"</div>
+        <blockquote>별자리 코리아 덕분에 우리 회사의 디지털 전환이 성공적으로 이루어졌습니다. 체계적이고 세심한 접근 방식이 인상적이었습니다.</blockquote>
+        <div class="testimonial-author">
+          <div class="author-avatar">김</div>
+          <div class="author-info">
+            <strong>김서현 대표</strong>
+            <span>넥스트테크 주식회사</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">"</div>
+        <blockquote>AI 솔루션 도입 후 데이터 분석 시간이 70% 단축되었습니다. 기대 이상의 결과를 만들어주셔서 감사합니다.</blockquote>
+        <div class="testimonial-author">
+          <div class="author-avatar">이</div>
+          <div class="author-info">
+            <strong>이준영 CTO</strong>
+            <span>클라우드원 코리아</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <div class="quote-mark">"</div>
+        <blockquote>브랜드 리뉴얼 프로젝트에서 보여준 창의성과 전문성이 탁월했습니다. 다음 프로젝트도 함께하고 싶습니다.</blockquote>
+        <div class="testimonial-author">
+          <div class="author-avatar">박</div>
+          <div class="author-info">
+            <strong>박지민 디렉터</strong>
+            <span>블루웨이브 미디어</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section id="contact" class="cta-section">
+  <div class="cta-inner reveal">
+    <div class="section-label">Contact Us</div>
+    <h2 class="section-title">새로운 별자리를<br>함께 그려보세요</h2>
+    <p class="section-desc">프로젝트에 대해 이야기하고 싶으시다면 언제든 연락해주세요. 여러분의 비전을 실현할 최적의 방법을 함께 찾겠습니다.</p>
+    <div class="hero-buttons">
+      <a href="mailto:contact@byeoljari.kr" class="btn-primary">상담 신청하기</a>
+      <a href="tel:+8221234-5678" class="btn-secondary">02-1234-5678</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+          <circle cx="18" cy="18" r="2.5" fill="#d4a853"/>
+          <circle cx="18" cy="18" r="8" stroke="#d4a853" stroke-width="0.5" opacity="0.5"/>
+          <circle cx="10" cy="10" r="1.5" fill="#d4a853" opacity="0.8"/>
+          <circle cx="28" cy="12" r="1" fill="#d4a853" opacity="0.6"/>
+          <circle cx="24" cy="28" r="1.2" fill="#d4a853" opacity="0.7"/>
+          <line x1="10" y1="10" x2="18" y2="18" stroke="#d4a853" stroke-width="0.3" opacity="0.4"/>
+          <line x1="28" y1="12" x2="18" y2="18" stroke="#d4a853" stroke-width="0.3" opacity="0.4"/>
+        </svg>
+        <span class="nav-logo-text">별자리 코리아</span>
+      </a>
+      <p>기술과 창의력을 연결하여 비즈니스의 무한한 가능성을 설계합니다.</p>
+    </div>
+    <div class="footer-col">
+      <h4>서비스</h4>
+      <a href="#">디지털 전환</a>
+      <a href="#">AI 솔루션</a>
+      <a href="#">UX 디자인</a>
+      <a href="#">소프트웨어 개발</a>
+    </div>
+    <div class="footer-col">
+      <h4>회사</h4>
+      <a href="#">회사소개</a>
+      <a href="#">채용정보</a>
+      <a href="#">블로그</a>
+      <a href="#">뉴스룸</a>
+    </div>
+    <div class="footer-col">
+      <h4>연락처</h4>
+      <a href="mailto:contact@byeoljari.kr">contact@byeoljari.kr</a>
+      <a href="#">서울시 강남구 테헤란로 123</a>
+      <a href="#">별자리빌딩 10층</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 별자리 코리아. All rights reserved.</span>
+    <div class="footer-bottom-links">
+      <a href="#">개인정보처리방침</a>
+      <a href="#">이용약관</a>
+      <a href="#">사이트맵</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Constellation Canvas Animation ──
+const canvas = document.getElementById('constellation-canvas');
+const ctx = canvas.getContext('2d');
+let width, height, stars, mouse;
+
+function init() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+  mouse = { x: width / 2, y: height / 2 };
+  
+  const starCount = Math.floor((width * height) / 8000);
+  stars = [];
+  
+  for (let i = 0; i < starCount; i++) {
+    stars.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      radius: Math.random() * 1.8 + 0.3,
+      opacity: Math.random() * 0.5 + 0.2,
+      twinkleSpeed: Math.random() * 0.02 + 0.005,
+      twinklePhase: Math.random() * Math.PI * 2,
+      isGold: Math.random() < 0.15
+    });
+  }
+}
+
+function drawStar(star, time) {
+  const twinkle = Math.sin(time * star.twinkleSpeed + star.twinklePhase) * 0.3 + 0.7;
+  const alpha = star.opacity * twinkle;
+  
+  if (star.isGold) {
+    ctx.fillStyle = `rgba(212, 168, 83, ${alpha})`;
+    ctx.shadowColor = 'rgba(212, 168, 83, 0.3)';
+    ctx.shadowBlur = 6;
+  } else {
+    ctx.fillStyle = `rgba(200, 200, 230, ${alpha * 0.7})`;
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+  }
+  
+  ctx.beginPath();
+  ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+}
+
+function drawConnections() {
+  const connectionDistance = 120;
+  const mouseDistance = 200;
+  
+  for (let i = 0; i < stars.length; i++) {
+    // Mouse connections
+    const mx = stars[i].x - mouse.x;
+    const my = stars[i].y - mouse.y;
+    const md = Math.sqrt(mx * mx + my * my);
+    
+    if (md < mouseDistance) {
+      const alpha = (1 - md / mouseDistance) * 0.25;
+      ctx.strokeStyle = `rgba(212, 168, 83, ${alpha})`;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(stars[i].x, stars[i].y);
+      ctx.lineTo(mouse.x, mouse.y);
+      ctx.stroke();
+    }
+    
+    // Star-to-star connections
+    for (let j = i + 1; j < stars.length; j++) {
+      const dx = stars[i].x - stars[j].x;
+      const dy = stars[i].y - stars[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      if (dist < connectionDistance) {
+        const alpha = (1 - dist / connectionDistance) * 0.08;
+        if (stars[i].isGold || stars[j].isGold) {
+          ctx.strokeStyle = `rgba(212, 168, 83, ${alpha * 2})`;
+        } else {
+          ctx.strokeStyle = `rgba(150, 150, 200, ${alpha})`;
+        }
+        ctx.lineWidth = 0.3;
+        ctx.beginPath();
+        ctx.moveTo(stars[i].x, stars[i].y);
+        ctx.lineTo(stars[j].x, stars[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function updateStars() {
+  stars.forEach(star => {
+    star.x += star.vx;
+    star.y += star.vy;
+    
+    // Mouse repel effect
+    const dx = star.x - mouse.x;
+    const dy = star.y - mouse.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 150 && dist > 0) {
+      const force = (150 - dist) / 150 * 0.02;
+      star.vx += (dx / dist) * force;
+      star.vy += (dy / dist) * force;
+    }
+    
+    // Damping
+    star.vx *= 0.999;
+    star.vy *= 0.999;
+    
+    // Wrap edges
+    if (star.x < -10) star.x = width + 10;
+    if (star.x > width + 10) star.x = -10;
+    if (star.y < -10) star.y = height + 10;
+    if (star.y > height + 10) star.y = -10;
+  });
+}
+
+let time = 0;
+function animate() {
+  time++;
+  ctx.clearRect(0, 0, width, height);
+  
+  // Subtle radial gradient background
+  const grad = ctx.createRadialGradient(width/2, height/3, 0, width/2, height/3, width * 0.7);
+  grad.addColorStop(0, 'rgba(20, 15, 40, 0.03)');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+  
+  drawConnections();
+  stars.forEach(star => drawStar(star, time));
+  updateStars();
+  
+  requestAnimationFrame(animate);
+}
+
+init();
+animate();
+
+window.addEventListener('resize', () => {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+});
+
+window.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+// Touch support
+window.addEventListener('touchmove', e => {
+  mouse.x = e.touches[0].clientX;
+  mouse.y = e.touches[0].clientY;
+});
+
+// ── Nav Scroll Effect ──
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ── Mobile Nav ──
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobileNav');
+
+hamburger.addEventListener('click', () => {
+  mobileNav.classList.toggle('active');
+  hamburger.classList.toggle('active');
+});
+
+function closeMobile() {
+  mobileNav.classList.remove('active');
+  hamburger.classList.remove('active');
+}
+
+// ── Scroll Reveal ──
+const revealElements = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, index) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+      }, index * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+revealElements.forEach(el => observer.observe(el));
+
+// ── Shooting Stars (occasional) ──
+function createShootingStar() {
+  const x = Math.random() * width;
+  const y = Math.random() * height * 0.5;
+  const length = Math.random() * 80 + 40;
+  const speed = Math.random() * 4 + 3;
+  const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.3;
+  let progress = 0;
+  
+  function drawShoot() {
+    if (progress > 1) return;
+    progress += speed / 200;
+    
+    const currentX = x + Math.cos(angle) * length * 3 * progress;
+    const currentY = y + Math.sin(angle) * length * 3 * progress;
+    const tailX = currentX - Math.cos(angle) * length;
+    const tailY = currentY - Math.sin(angle) * length;
+    
+    const grad = ctx.createLinearGradient(tailX, tailY, currentX, currentY);
+    grad.addColorStop(0, 'rgba(212, 168, 83, 0)');
+    grad.addColorStop(1, `rgba(212, 168, 83, ${(1 - progress) * 0.6})`);
+    
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.lineTo(currentX, currentY);
+    ctx.stroke();
+    
+    requestAnimationFrame(drawShoot);
+  }
+  drawShoot();
+}
+
+setInterval(() => {
+  if (Math.random() < 0.4) createShootingStar();
+}, 3000);
+</script>
+
+</body>
+</html>

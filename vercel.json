@@ -1,0 +1,4 @@
+{
+  "outputDirectory": "public",
+  "ignoreCommand": "exit 0"
+}
