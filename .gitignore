@@ -1,0 +1,43 @@
+# Flutter
+**/android/
+**/ios/
+**/build/
+*.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+*.egg
+.venv/
+venv/
+env/
+
+# Environment & secrets
+.env
+.env.*
+*.pem
+credentials.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Supabase
+supabase/.temp/
+
+# Large data files (re-downloadable from public APIs)
+기획자료/소상공인시장진흥공단_상가(상권)정보_20251030/*.csv
